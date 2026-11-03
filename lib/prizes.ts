@@ -16,7 +16,7 @@ export const PRIZES: Prize[] = [
     description: "5% off your order on eligible items.",
     color: "#78716c",
     weight: 195,
-    stockCap: 350,
+    stockCap: 355,
   },
   {
     id: "10off",
@@ -56,7 +56,7 @@ export const PRIZES: Prize[] = [
     description: "30% off — one of our best discounts.",
     color: "#7e22ce",
     weight: 50,
-    stockCap: 25,
+    stockCap: 20,
   },
   {
     id: "brazil-jacket",
