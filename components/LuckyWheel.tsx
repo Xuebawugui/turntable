@@ -26,7 +26,7 @@ export function LuckyWheel({ prizes, spinning, targetIndex, onSpinEnd }: Props) 
   const slice = count > 0 ? 360 / count : 0;
 
   const conicGradient = useMemo(() => {
-    if (count === 0) return "hsl(0 0% 15%)";
+    if (count === 0) return "hsl(0 0% 22%)";
     const stops = prizes
       .map((p, i) => {
         const start = (i / count) * 100;
@@ -53,7 +53,7 @@ export function LuckyWheel({ prizes, spinning, targetIndex, onSpinEnd }: Props) 
   }, [spinning, targetIndex, count, slice, onSpinEnd]);
 
   const labels = useMemo(() => {
-    const r = 36;
+    const r = 34;
     return prizes.map((p, i) => {
       const angleDeg = i * slice + slice / 2 - 90;
       const rad = (angleDeg * Math.PI) / 180;
@@ -66,14 +66,24 @@ export function LuckyWheel({ prizes, spinning, targetIndex, onSpinEnd }: Props) 
   const sizeClass =
     "w-[min(100%,calc(100vw-3rem))] max-w-[min(340px,85vw)] sm:max-w-[380px]";
 
+  if (count === 0) {
+    return (
+      <div
+        className={`relative mx-auto flex aspect-square items-center justify-center rounded-full border border-white/10 bg-zinc-800 ${sizeClass}`}
+      >
+        <p className="px-4 text-center text-sm text-muted-foreground">Loading prizes…</p>
+      </div>
+    );
+  }
+
   return (
     <div className={`relative mx-auto aspect-square ${sizeClass}`}>
-      <div className="absolute inset-[-6px] rounded-full bg-gradient-to-b from-white/15 to-white/5 p-[1px] shadow-glow">
-        <div className="h-full w-full rounded-full bg-black/40" />
+      <div className="absolute inset-[-6px] rounded-full bg-gradient-to-b from-white/20 to-white/5 p-[1px] shadow-glow">
+        <div className="h-full w-full rounded-full bg-zinc-900" />
       </div>
 
       <div
-        className="absolute inset-0 rounded-full border border-white/10 shadow-[inset_0_0_40px_rgba(0,0,0,0.6)] transition-transform ease-[cubic-bezier(0.15,0.85,0.25,1)]"
+        className="absolute inset-0 overflow-hidden rounded-full border-2 border-white/15 shadow-[inset_0_0_30px_rgba(0,0,0,0.45)] transition-transform ease-[cubic-bezier(0.15,0.85,0.25,1)]"
         style={{
           background: conicGradient,
           transform: `rotate(${rotation}deg)`,
@@ -83,20 +93,21 @@ export function LuckyWheel({ prizes, spinning, targetIndex, onSpinEnd }: Props) 
         {Array.from({ length: count }).map((_, i) => (
           <div
             key={`line-${i}`}
-            className="absolute left-1/2 top-1/2 h-1/2 w-px origin-bottom bg-black/25"
+            className="absolute left-1/2 top-1/2 h-1/2 w-[2px] origin-bottom bg-white/35"
             style={{ transform: `translateX(-50%) rotate(${i * slice - 90}deg)` }}
           />
         ))}
         {labels.map((item) => (
           <span
             key={item.id}
-            className={`absolute max-w-[4.5rem] truncate text-center text-[10px] font-semibold leading-tight tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] sm:max-w-[5rem] sm:text-xs ${
-              item.grand ? "text-amber-100" : "text-white/95"
+            className={`absolute z-10 max-w-[3.25rem] text-center text-[9px] font-bold leading-tight sm:max-w-[4rem] sm:text-[10px] ${
+              item.grand ? "text-amber-50" : "text-white"
             }`}
             style={{
               left: `${item.x}%`,
               top: `${item.y}%`,
               transform: `translate(-50%, -50%) rotate(${item.rotate}deg)`,
+              textShadow: "0 1px 3px rgba(0,0,0,0.9)",
             }}
           >
             {item.label}
@@ -115,8 +126,8 @@ export function LuckyWheel({ prizes, spinning, targetIndex, onSpinEnd }: Props) 
         </svg>
       </div>
 
-      <div className="pointer-events-none absolute left-1/2 top-1/2 z-20 flex h-[18%] min-h-[52px] w-[18%] min-w-[52px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-zinc-950 shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
-        <span className="font-mono text-[10px] font-medium uppercase tracking-widest text-white/90 sm:text-xs">
+      <div className="pointer-events-none absolute left-1/2 top-1/2 z-20 flex h-[18%] min-h-[52px] w-[18%] min-w-[52px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/25 bg-zinc-950 shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
+        <span className="font-mono text-[10px] font-medium uppercase tracking-widest text-white sm:text-xs">
           Spin
         </span>
       </div>

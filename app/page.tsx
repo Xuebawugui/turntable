@@ -11,15 +11,8 @@ import {
   isFrenchPhoneComplete,
   normalizeFrenchPhone,
 } from "@/lib/phone";
+import { getDefaultInventory, getWheelPrizes } from "@/lib/wheel-display";
 import { useCallback, useEffect, useState } from "react";
-
-type WheelPrize = {
-  id: string;
-  label: string;
-  color: string;
-  grand?: boolean;
-  index: number;
-};
 
 type ResultPrize = {
   id: string;
@@ -29,8 +22,8 @@ type ResultPrize = {
 };
 
 export default function HomePage() {
-  const [prizes, setPrizes] = useState<WheelPrize[]>([]);
-  const [inventory, setInventory] = useState<InventoryRow[]>([]);
+  const [prizes] = useState(() => getWheelPrizes());
+  const [inventory, setInventory] = useState<InventoryRow[]>(() => getDefaultInventory());
   const [campaignClosed, setCampaignClosed] = useState(false);
   const [phoneNational, setPhoneNational] = useState("");
   const [loading, setLoading] = useState(false);
@@ -73,14 +66,14 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    Promise.all([fetch("/api/prizes"), fetch("/api/campaign")])
-      .then(async ([pRes, cRes]) => {
-        const pData = await pRes.json();
-        const cData = await cRes.json();
-        setPrizes(pData.prizes ?? []);
+    fetch("/api/campaign")
+      .then((r) => r.json())
+      .then((cData) => {
         applyCampaignPayload(cData);
       })
-      .catch(() => setError("Could not load the wheel. Refresh to try again."));
+      .catch(() => {
+        setInventory(getDefaultInventory());
+      });
   }, [applyCampaignPayload]);
 
   const refreshCampaign = useCallback(() => {
@@ -212,6 +205,32 @@ export default function HomePage() {
                 onSpinEnd={handleSpinEnd}
               />
 
+              <p className="mt-4 text-center text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                On the wheel
+              </p>
+              <ul className="mt-2 flex flex-wrap justify-center gap-2 text-[11px] sm:text-xs">
+                {inventory.map((item) => (
+                  <li
+                    key={item.id}
+                    className={`rounded-md border px-2 py-1 ${
+                      item.soldOut
+                        ? "border-white/5 text-muted-foreground line-through opacity-60"
+                        : item.grand
+                          ? "border-amber-500/40 bg-amber-500/10 text-amber-100"
+                          : "border-white/10 bg-white/5 text-foreground"
+                    }`}
+                  >
+                    {item.grand ? "★ " : ""}
+                    {item.label}
+                    {!item.soldOut && (
+                      <span className="ml-1 font-mono text-[10px] text-muted-foreground">
+                        ({item.left})
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+
               <form onSubmit={handleDraw} className="mt-8 space-y-3">
                 <div className="space-y-2">
                   <label htmlFor="phone" className="text-sm font-medium text-foreground">
@@ -269,7 +288,7 @@ export default function HomePage() {
           </section>
 
           <footer className="mt-8 text-center text-xs leading-relaxed text-muted-foreground">
-            Discounts from 9.5折 to 7折 (5%–30% off). One spin per mobile number.
+            Coupon discounts from 5% to 30% off. One spin per mobile number.
           </footer>
         </div>
       </main>
