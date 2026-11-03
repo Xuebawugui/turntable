@@ -12,7 +12,7 @@ Vercel serverless functions are **stateless** — they do not keep data on the s
 | Vercel Postgres / Neon | Relational data |
 | Supabase, PlanetScale, etc. | Same idea, connect via env vars |
 
-In the Vercel dashboard: **Project → Storage → Connect Upstash Redis**. Vercel injects `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` automatically.
+In the Vercel dashboard: **Project → Storage → Connect Upstash Redis**. Vercel usually injects `KV_REST_API_URL` and `KV_REST_API_TOKEN` (this app accepts those and `UPSTASH_REDIS_REST_*`).
 
 Live **remaining stock** (coupons + physical prizes) is read from Redis on each page load and after each spin — this works on Vercel as long as Redis is connected.
 

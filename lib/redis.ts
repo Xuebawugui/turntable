@@ -10,12 +10,25 @@ import {
 
 let redis: Redis | null = null;
 
-export function getRedis(): Redis | null {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+/** Vercel Storage may inject KV_* or UPSTASH_REDIS_REST_* — support both */
+function getRedisCredentials(): { url: string; token: string } | null {
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
   if (!url || !token) return null;
+  return { url, token };
+}
+
+export function isRedisConfigured(): boolean {
+  return getRedisCredentials() !== null;
+}
+
+export function getRedis(): Redis | null {
+  const creds = getRedisCredentials();
+  if (!creds) return null;
   if (!redis) {
-    redis = new Redis({ url, token });
+    redis = new Redis({ url: creds.url, token: creds.token });
   }
   return redis;
 }

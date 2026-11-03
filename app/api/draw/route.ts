@@ -3,6 +3,7 @@ import { formatE164FrenchDisplay, normalizeFrenchPhone } from "@/lib/phone";
 import { getPrizeById } from "@/lib/prizes";
 import {
   getDrawByPhone,
+  isRedisConfigured,
   pickCampaignPrize,
   releaseSpinSlot,
   reserveSpinSlot,
@@ -87,7 +88,7 @@ export async function POST(req: NextRequest) {
   if (!saved) {
     await rollbackPrizeReservation(prize.id);
 
-    if (!process.env.UPSTASH_REDIS_REST_URL) {
+    if (!isRedisConfigured()) {
       if (process.env.NODE_ENV === "production") {
         return NextResponse.json(
           { error: "Storage is not configured. Please try again later." },
